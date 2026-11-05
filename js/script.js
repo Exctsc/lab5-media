@@ -28,7 +28,6 @@ let hornSound = document.getElementById("hornSound");
 let cuckooSound = document.getElementById("cuckooSound");
 
 // VARIABLES
-// The soundscape has 5 parts
 let partNames = ["The Credit River", "Riverwood", "Mississauga Road", "The Crosswalk", "Erindale GO"];
 let partText = [
   "Water over the rocks, wind in the trees, and Canada geese flying over.",
@@ -37,14 +36,13 @@ let partText = [
   "The signal ticks while I wait, then the walk sound says I can cross.",
   "The crossing bell rings and a GO train blows its horn."
 ];
-// the sky gets darker as the walk goes on
 let skyColors = ["#3d3560", "#2c2a55", "#1d2246", "#151b3a", "#0b1228"];
 
-let volumeLevel = 10; // 0 to 10
+let volumeLevel = 10;
 
 // FUNCTIONS
 
-// Works out which part (0 to 4) is playing
+// which part is playing
 function getPart(time) {
   if (time >= 58) {
     return 4;
@@ -59,30 +57,26 @@ function getPart(time) {
   }
 }
 
-// How far along we are between two times (0 = start, 1 = end)
 function between(time, start, end) {
   return (time - start) / (end - start);
 }
 
-// Runs every time the audio moves forward and updates the whole scene
 function updateScene() {
   let time = player.currentTime;
   let part = getPart(time);
 
-  // caption and sky
   document.getElementById("partName").innerHTML = "Part " + (part + 1) + ": " + partNames[part];
   document.getElementById("partText").innerHTML = partText[part];
   sky.style.backgroundColor = skyColors[part];
 
-  // more stars come out as it gets later
   stars.style.opacity = 0.2 + (time / player.duration) * 0.8;
 
-  // the moon moves across the sky in an arc
+  // moon
   let p = time / player.duration;
   moon.style.left = (470 + p * 360) + "px";
   moon.style.top = (20 + 240 * (p - 0.5) * (p - 0.5)) + "px";
 
-  // the river at the start, then the road
+  // river or road
   if (time < 26) {
     river.style.opacity = 1;
     road.style.opacity = 0;
@@ -101,7 +95,7 @@ function updateScene() {
   updateMessage();
 }
 
-// Geese fly across while you hear them (5s to 14s)
+// geese
 function moveGeese(time) {
   if (time >= 5 && time <= 14) {
     geese.style.opacity = 1;
@@ -111,13 +105,12 @@ function moveGeese(time) {
   }
 }
 
-// Leaves fall while you hear footsteps on leaves (14s to 33s)
+// leaves
 function moveLeaves(time) {
   if (time >= 14 && time <= 33) {
     leaf1.style.display = "block";
     leaf2.style.display = "block";
     leaf3.style.display = "block";
-    // % makes each leaf start again at the top every 5 seconds
     leaf1.style.top = (-50 + ((time - 14) % 5) * 110) + "px";
     leaf2.style.top = (-50 + ((time - 12) % 5) * 110) + "px";
     leaf3.style.top = (-50 + ((time - 10.5) % 5) * 110) + "px";
@@ -128,7 +121,7 @@ function moveLeaves(time) {
   }
 }
 
-// A car drives by when you hear cars
+// car
 function moveCar(time) {
   if (time >= 28 && time <= 34) {
     car.style.left = (-150 + between(time, 28, 34) * 1150) + "px";
@@ -139,7 +132,7 @@ function moveCar(time) {
   }
 }
 
-// The bus pulls in, stops, then leaves
+// bus
 function moveBus(time) {
   if (time >= 35 && time < 40) {
     bus.style.left = (-300 + between(time, 35, 40) * 550) + "px";
@@ -152,8 +145,7 @@ function moveBus(time) {
   }
 }
 
-// The walk signal turns on during the walk sound (51s to 58.5s)
-// or while you play its sound effect by clicking it
+// walk signal
 function updateSignal(time) {
   if (time >= 51 && time <= 58.5) {
     signal.src = "images/signal-walk.svg";
@@ -164,7 +156,7 @@ function updateSignal(time) {
   }
 }
 
-// The train goes by while you hear it (62s to 78s)
+// train
 function moveTrain(time) {
   if (time >= 62 && time <= 78) {
     train.style.left = (-760 + between(time, 62, 78) * 1760) + "px";
@@ -173,7 +165,7 @@ function moveTrain(time) {
   }
 }
 
-// The crossing lights take turns flashing while the bell rings (59s to 74s)
+// crossing lights
 function updateCrossing(time) {
   if (time >= 59 && time <= 74) {
     if (Math.floor(time) % 2 == 0) {
@@ -189,7 +181,6 @@ function updateCrossing(time) {
   }
 }
 
-// Shows the time and volume under the scene
 function updateMessage() {
   let minutes = Math.floor(player.currentTime / 60);
   let seconds = Math.floor(player.currentTime) - minutes * 60;
@@ -240,7 +231,6 @@ function normalSpeed() {
 
 // MEDIA EVENTS
 
-// the scene is bright while playing and dim when paused
 function playerStarted() {
   scene.style.opacity = 1;
 }
@@ -253,13 +243,12 @@ function playerEnded() {
   fact.innerHTML = "That's the walk home. Press play to go again.";
 }
 
-// the moon gets dimmer when the volume goes down
 function volumeChanged() {
   moon.style.opacity = 0.3 + player.volume * 0.7;
   updateMessage();
 }
 
-// CLICKING THINGS IN THE SCENE
+// CLICKING THINGS
 
 function clickGeese() {
   gooseSound.currentTime = 0;
@@ -285,7 +274,6 @@ function clickSignal() {
   fact.innerHTML = "In Ontario the walk signal makes a cuckoo or chirp sound.";
 }
 
-// clicking the moon plays or pauses the soundscape
 function clickMoon() {
   if (player.paused) {
     player.play();
@@ -294,7 +282,6 @@ function clickMoon() {
   }
 }
 
-// the signal shows "walk" while its sound effect plays
 function cuckooStarted() {
   signal.src = "images/signal-walk.svg";
 }
@@ -303,7 +290,7 @@ function cuckooEnded() {
   updateSignal(player.currentTime);
 }
 
-// MOUSE: the trees and skyline move a little with the mouse (parallax)
+// parallax
 function mouseMoved(e) {
   trees.style.left = (-30 - e.clientX / 30) + "px";
   skyline.style.left = (0 - e.clientX / 80) + "px";

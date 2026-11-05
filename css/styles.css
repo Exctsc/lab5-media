@@ -20,7 +20,6 @@ audio {
   width: 100%;
 }
 
-/* the scene: everything inside is placed with position absolute */
 #scene {
   position: relative;
   width: 900px;
