@@ -1,6 +1,9 @@
 // ELEMENTS
 let player = document.getElementById("player");
 let scene = document.getElementById("scene");
+let message = document.getElementById("message");
+let fact = document.getElementById("fact");
+
 let sky = document.getElementById("sky");
 let stars = document.getElementById("stars");
 let moon = document.getElementById("moon");
@@ -12,14 +15,12 @@ let lightLeft = document.getElementById("lightLeft");
 let lightRight = document.getElementById("lightRight");
 let road = document.getElementById("road");
 let river = document.getElementById("river");
-let carRight = document.getElementById("carRight");
-let carLeft = document.getElementById("carLeft");
+let car = document.getElementById("car");
 let bus = document.getElementById("bus");
 let signal = document.getElementById("signal");
-let leaves = document.getElementById("leaves");
-let progress = document.getElementById("progress");
-let message = document.getElementById("message");
-let fact = document.getElementById("fact");
+let leaf1 = document.getElementById("leaf1");
+let leaf2 = document.getElementById("leaf2");
+let leaf3 = document.getElementById("leaf3");
 
 let gooseSound = document.getElementById("gooseSound");
 let chimeSound = document.getElementById("chimeSound");
@@ -27,74 +28,61 @@ let hornSound = document.getElementById("hornSound");
 let cuckooSound = document.getElementById("cuckooSound");
 
 // VARIABLES
-// The soundscape has five parts. Each part starts at a time (in seconds).
-let partStarts = [0, 14, 28, 46, 58];
+// The soundscape has 5 parts
 let partNames = ["The Credit River", "Riverwood", "Mississauga Road", "The Crosswalk", "Erindale GO"];
 let partText = [
-  "Water running over the rocks, wind in the trees, and Canada geese heading out for the night.",
-  "Walking up through Riverwood. Dry November leaves crunch with every step.",
-  "Cars on Mississauga Road. A bus pulls in, the air brakes hiss, the doors chime, and it pulls away.",
-  "The signal ticks while I wait. Then the cuckoo sound says it is safe to cross.",
-  "The crossing bell rings and a GO train sounds its horn on the Milton line."
+  "Water over the rocks, wind in the trees, and Canada geese flying over.",
+  "Walking up through Riverwood. Dry leaves crunch with every step.",
+  "Cars go by. A bus pulls in, the brakes hiss, the doors chime, and it leaves.",
+  "The signal ticks while I wait, then the walk sound says I can cross.",
+  "The crossing bell rings and a GO train blows its horn."
 ];
 // the sky gets darker as the walk goes on
 let skyColors = ["#3d3560", "#2c2a55", "#1d2246", "#151b3a", "#0b1228"];
 
-let volume = 1.0;
-let length = 80; // updated to the real length once the audio loads
+let volumeLevel = 10; // 0 to 10
 
 // FUNCTIONS
 
-// Works out which part (0 to 4) is playing at a given time
+// Works out which part (0 to 4) is playing
 function getPart(time) {
-  if (time >= partStarts[4]) {
+  if (time >= 58) {
     return 4;
-  } else if (time >= partStarts[3]) {
+  } else if (time >= 46) {
     return 3;
-  } else if (time >= partStarts[2]) {
+  } else if (time >= 28) {
     return 2;
-  } else if (time >= partStarts[1]) {
+  } else if (time >= 14) {
     return 1;
   } else {
     return 0;
   }
 }
 
-// How far along we are between a start and end time (0 = start, 1 = end)
+// How far along we are between two times (0 = start, 1 = end)
 function between(time, start, end) {
   return (time - start) / (end - start);
 }
 
-// Turns seconds into m:ss
-function formatTime(seconds) {
-  let minutes = Math.floor(seconds / 60);
-  let secs = Math.floor(seconds) - minutes * 60;
-  if (secs < 10) {
-    secs = "0" + secs;
-  }
-  return minutes + ":" + secs;
-}
-
-// Runs every time the audio moves forward (timeupdate) and moves everything in the scene
+// Runs every time the audio moves forward and updates the whole scene
 function updateScene() {
   let time = player.currentTime;
   let part = getPart(time);
 
-  // caption and sky colour
-  document.getElementById("partNumber").innerHTML = "Part " + (part + 1) + " of 5";
-  document.getElementById("partName").innerHTML = partNames[part];
+  // caption and sky
+  document.getElementById("partName").innerHTML = "Part " + (part + 1) + ": " + partNames[part];
   document.getElementById("partText").innerHTML = partText[part];
   sky.style.backgroundColor = skyColors[part];
 
   // more stars come out as it gets later
-  stars.style.opacity = 0.2 + (time / length) * 0.8;
+  stars.style.opacity = 0.2 + (time / player.duration) * 0.8;
 
-  // the moon travels across the sky in an arc over the whole track
-  let p = time / length;
-  moon.style.left = (52 + p * 38) + "%";
-  moon.style.top = (6 + 60 * (p - 0.5) * (p - 0.5)) + "%";
+  // the moon moves across the sky in an arc
+  let p = time / player.duration;
+  moon.style.left = (470 + p * 360) + "px";
+  moon.style.top = (20 + 240 * (p - 0.5) * (p - 0.5)) + "px";
 
-  // ground: river at the start, road once we reach Mississauga Road
+  // the river at the start, then the road
   if (time < 26) {
     river.style.opacity = 1;
     road.style.opacity = 0;
@@ -104,71 +92,68 @@ function updateScene() {
   }
 
   moveGeese(time);
-  showLeaves(time);
-  moveCars(time);
+  moveLeaves(time);
+  moveCar(time);
   moveBus(time);
   updateSignal(time);
   moveTrain(time);
   updateCrossing(time);
-
-  // progress bar and message
-  progress.style.width = (time / length) * 100 + "%";
   updateMessage();
 }
 
-// Geese fly across while you hear them honking (5s to 14s)
+// Geese fly across while you hear them (5s to 14s)
 function moveGeese(time) {
   if (time >= 5 && time <= 14) {
     geese.style.opacity = 1;
-    geese.style.left = (-20 + between(time, 5, 14) * 125) + "%";
+    geese.style.left = (-200 + between(time, 5, 14) * 1200) + "px";
   } else {
     geese.style.opacity = 0;
   }
 }
 
-// Leaves fall during the footsteps on leaves (14s to 33s)
-function showLeaves(time) {
+// Leaves fall while you hear footsteps on leaves (14s to 33s)
+function moveLeaves(time) {
   if (time >= 14 && time <= 33) {
-    leaves.style.display = "block";
+    leaf1.style.display = "block";
+    leaf2.style.display = "block";
+    leaf3.style.display = "block";
+    // % makes each leaf start again at the top every 5 seconds
+    leaf1.style.top = (-50 + ((time - 14) % 5) * 110) + "px";
+    leaf2.style.top = (-50 + ((time - 12) % 5) * 110) + "px";
+    leaf3.style.top = (-50 + ((time - 10.5) % 5) * 110) + "px";
   } else {
-    leaves.style.display = "none";
+    leaf1.style.display = "none";
+    leaf2.style.display = "none";
+    leaf3.style.display = "none";
   }
 }
 
-// Cars drive by at the same times you hear them pass
-function moveCars(time) {
+// A car drives by when you hear cars
+function moveCar(time) {
   if (time >= 28 && time <= 34) {
-    carRight.style.left = (-15 + between(time, 28, 34) * 130) + "%";
+    car.style.left = (-150 + between(time, 28, 34) * 1150) + "px";
   } else if (time >= 49 && time <= 54.5) {
-    carRight.style.left = (-15 + between(time, 49, 54.5) * 130) + "%";
+    car.style.left = (-150 + between(time, 49, 54.5) * 1150) + "px";
   } else {
-    carRight.style.left = "-20%";
-  }
-
-  if (time >= 31.5 && time <= 36) {
-    carLeft.style.left = (110 - between(time, 31.5, 36) * 130) + "%";
-  } else if (time >= 45.5 && time <= 50.5) {
-    carLeft.style.left = (110 - between(time, 45.5, 50.5) * 130) + "%";
-  } else {
-    carLeft.style.left = "110%";
+    car.style.left = "-150px";
   }
 }
 
-// The bus pulls in, stops while the brakes and doors go, then leaves
+// The bus pulls in, stops, then leaves
 function moveBus(time) {
   if (time >= 35 && time < 40) {
-    bus.style.left = (-30 + between(time, 35, 40) * 60) + "%";
+    bus.style.left = (-300 + between(time, 35, 40) * 550) + "px";
   } else if (time >= 40 && time < 44.5) {
-    bus.style.left = "30%";
+    bus.style.left = "250px";
   } else if (time >= 44.5 && time <= 50.5) {
-    bus.style.left = (30 + between(time, 44.5, 50.5) * 80) + "%";
+    bus.style.left = (250 + between(time, 44.5, 50.5) * 750) + "px";
   } else {
-    bus.style.left = "-35%";
+    bus.style.left = "-300px";
   }
 }
 
-// The walk signal turns on when you hear the cuckoo (51s to 58.5s)
-// or while you are playing its sound effect by clicking it
+// The walk signal turns on during the walk sound (51s to 58.5s)
+// or while you play its sound effect by clicking it
 function updateSignal(time) {
   if (time >= 51 && time <= 58.5) {
     signal.src = "images/signal-walk.svg";
@@ -179,41 +164,39 @@ function updateSignal(time) {
   }
 }
 
-// The train crosses while you hear it rumble past (62s to 78s)
+// The train goes by while you hear it (62s to 78s)
 function moveTrain(time) {
   if (time >= 62 && time <= 78) {
-    train.style.left = (-85 + between(time, 62, 78) * 190) + "%";
+    train.style.left = (-760 + between(time, 62, 78) * 1760) + "px";
   } else {
-    train.style.left = "-85%";
+    train.style.left = "-760px";
   }
 }
 
-// The crossing lights flash while the bell rings (59s to 74s)
+// The crossing lights take turns flashing while the bell rings (59s to 74s)
 function updateCrossing(time) {
   if (time >= 59 && time <= 74) {
-    lightLeft.style.animation = "blink 1.1s infinite";
-    lightRight.style.animation = "blink 1.1s infinite 0.55s";
+    if (Math.floor(time) % 2 == 0) {
+      lightLeft.style.backgroundColor = "red";
+      lightRight.style.backgroundColor = "#3a1515";
+    } else {
+      lightLeft.style.backgroundColor = "#3a1515";
+      lightRight.style.backgroundColor = "red";
+    }
   } else {
-    lightLeft.style.animation = "none";
-    lightRight.style.animation = "none";
+    lightLeft.style.backgroundColor = "#3a1515";
+    lightRight.style.backgroundColor = "#3a1515";
   }
 }
 
-// Shows time, volume and speed under the scene
+// Shows the time and volume under the scene
 function updateMessage() {
-  message.innerHTML = "time: " + formatTime(player.currentTime) + " / " + formatTime(length);
-  message.innerHTML += " | volume: " + Math.round(player.volume * 100) + "%";
-  message.innerHTML += " | speed: " + player.playbackRate + "x";
-}
-
-// Pauses or plays the falling leaves together with the audio
-function setLeaves(state) {
-  document.getElementById("leaf1").style.animationPlayState = state;
-  document.getElementById("leaf2").style.animationPlayState = state;
-  document.getElementById("leaf3").style.animationPlayState = state;
-  document.getElementById("leaf4").style.animationPlayState = state;
-  document.getElementById("leaf5").style.animationPlayState = state;
-  river.style.animationPlayState = state;
+  let minutes = Math.floor(player.currentTime / 60);
+  let seconds = Math.floor(player.currentTime) - minutes * 60;
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+  message.innerHTML = "time: " + minutes + ":" + seconds + " | volume: " + volumeLevel * 10 + "%";
 }
 
 // MEDIA CONTROLS
@@ -232,19 +215,19 @@ function stopAudio() {
 }
 
 function volumeUp() {
-  volume += 0.1;
-  if (volume > 1.0) {
-    volume = 1.0;
+  volumeLevel += 1;
+  if (volumeLevel > 10) {
+    volumeLevel = 10;
   }
-  player.volume = volume;
+  player.volume = volumeLevel / 10;
 }
 
 function volumeDown() {
-  volume -= 0.1;
-  if (volume < 0.0) {
-    volume = 0.0;
+  volumeLevel -= 1;
+  if (volumeLevel < 0) {
+    volumeLevel = 0;
   }
-  player.volume = volume;
+  player.volume = volumeLevel / 10;
 }
 
 function slowSpeed() {
@@ -255,50 +238,15 @@ function normalSpeed() {
   player.playbackRate = 1;
 }
 
-function fastSpeed() {
-  player.playbackRate = 1.5;
-}
-
-// jumps to the start of a part and plays from there
-function jumpTo(part) {
-  player.currentTime = partStarts[part];
-  player.play();
-}
-
-function jumpToPart1() {
-  jumpTo(0);
-}
-
-function jumpToPart2() {
-  jumpTo(1);
-}
-
-function jumpToPart3() {
-  jumpTo(2);
-}
-
-function jumpToPart4() {
-  jumpTo(3);
-}
-
-function jumpToPart5() {
-  jumpTo(4);
-}
-
 // MEDIA EVENTS
 
-// the scene is in colour while playing and goes grey when paused
+// the scene is bright while playing and dim when paused
 function playerStarted() {
-  scene.style.filter = "none";
-  setLeaves("running");
+  scene.style.opacity = 1;
 }
 
 function playerPaused() {
-  scene.style.filter = "grayscale(60%) brightness(0.75)";
-  setLeaves("paused");
-  if (player.currentTime > 0 && player.ended == false) {
-    fact.innerHTML = "Paused at " + formatTime(player.currentTime) + ".";
-  }
+  scene.style.opacity = 0.6;
 }
 
 function playerEnded() {
@@ -307,22 +255,16 @@ function playerEnded() {
 
 // the moon gets dimmer when the volume goes down
 function volumeChanged() {
-  volume = player.volume;
   moon.style.opacity = 0.3 + player.volume * 0.7;
   updateMessage();
 }
 
-function audioLoaded() {
-  length = player.duration;
-  updateMessage();
-}
-
-// CLICKING THINGS IN THE SCENE (each one plays its own sound effect)
+// CLICKING THINGS IN THE SCENE
 
 function clickGeese() {
   gooseSound.currentTime = 0;
   gooseSound.play();
-  fact.innerHTML = "Honk! Canada geese hang around the Credit River almost all year.";
+  fact.innerHTML = "Honk! Canada geese live along the Credit River almost all year.";
 }
 
 function clickBus() {
@@ -334,15 +276,16 @@ function clickBus() {
 function clickTrain() {
   hornSound.currentTime = 0;
   hornSound.play();
-  fact.innerHTML = "Two long, one short, one long: the horn pattern trains use at a crossing.";
+  fact.innerHTML = "Long, long, short, long: the horn pattern trains use at a crossing.";
 }
 
 function clickSignal() {
   cuckooSound.currentTime = 0;
   cuckooSound.play();
-  fact.innerHTML = "In Ontario the walk signal goes cuckoo or chirp depending on which way you cross.";
+  fact.innerHTML = "In Ontario the walk signal makes a cuckoo or chirp sound.";
 }
 
+// clicking the moon plays or pauses the soundscape
 function clickMoon() {
   if (player.paused) {
     player.play();
@@ -351,7 +294,7 @@ function clickMoon() {
   }
 }
 
-// the walk signal shows "walk" while its sound effect is playing
+// the signal shows "walk" while its sound effect plays
 function cuckooStarted() {
   signal.src = "images/signal-walk.svg";
 }
@@ -360,11 +303,10 @@ function cuckooEnded() {
   updateSignal(player.currentTime);
 }
 
-// MOUSE: trees and skyline move a little with the mouse (parallax)
+// MOUSE: the trees and skyline move a little with the mouse (parallax)
 function mouseMoved(e) {
-  let x = e.clientX / window.innerWidth - 0.5;
-  trees.style.left = (-5 - x * 6) + "%";
-  skyline.style.left = (0 - x * 2) + "%";
+  trees.style.left = (-30 - e.clientX / 30) + "px";
+  skyline.style.left = (0 - e.clientX / 80) + "px";
 }
 
 // EVENT LISTENERS
@@ -376,21 +318,12 @@ document.getElementById("volUpBtn").addEventListener("click", volumeUp);
 document.getElementById("volDownBtn").addEventListener("click", volumeDown);
 document.getElementById("slowBtn").addEventListener("click", slowSpeed);
 document.getElementById("normalBtn").addEventListener("click", normalSpeed);
-document.getElementById("fastBtn").addEventListener("click", fastSpeed);
-
-document.getElementById("part1Btn").addEventListener("click", jumpToPart1);
-document.getElementById("part2Btn").addEventListener("click", jumpToPart2);
-document.getElementById("part3Btn").addEventListener("click", jumpToPart3);
-document.getElementById("part4Btn").addEventListener("click", jumpToPart4);
-document.getElementById("part5Btn").addEventListener("click", jumpToPart5);
 
 player.addEventListener("timeupdate", updateScene);
 player.addEventListener("play", playerStarted);
 player.addEventListener("pause", playerPaused);
 player.addEventListener("ended", playerEnded);
 player.addEventListener("volumechange", volumeChanged);
-player.addEventListener("ratechange", updateMessage);
-player.addEventListener("loadedmetadata", audioLoaded);
 
 geese.addEventListener("click", clickGeese);
 bus.addEventListener("click", clickBus);
@@ -401,6 +334,3 @@ cuckooSound.addEventListener("play", cuckooStarted);
 cuckooSound.addEventListener("ended", cuckooEnded);
 
 scene.addEventListener("mousemove", mouseMoved);
-
-// start with the leaves paused until the audio plays
-setLeaves("paused");
