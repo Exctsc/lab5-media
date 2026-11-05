@@ -3,33 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lab 5 - Sound and Vision</title>
+  <title>Lab 5 - Erindale After Dark</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <h1>Mississauga at Night</h1>
-  <p>A soundscape of my neighbourhood in Erindale. Press play and watch the scene react.</p>
+  <header>
+    <p class="label">CCT360 Lab 5: Design with Sound and Vision</p>
+    <h1>Erindale After Dark</h1>
+    <p class="intro">An evening walk through my neighbourhood in Mississauga, from the Credit River up to the Erindale GO tracks. Listen first, then watch the street react.</p>
+  </header>
 
-  <!-- Part A: Soundscape -->
-  <audio id="player">
-    <source src="audio/soundscape.mp3" type="audio/mpeg">
-    Your browser does not support this audio element
+  <!-- PART A: SOUNDSCAPE -->
+  <section id="partA">
+    <h2>Part A: Soundscape</h2>
+    <p>80 seconds, in five parts. Headphones make it better.</p>
+
+    <audio id="player" controls preload="auto">
+      <source src="audio/soundscape.mp3" type="audio/mpeg">
+      Your browser does not support this audio element
+    </audio>
+
+    <ol id="trackList">
+      <li><span>0:00</span> The Credit River: water, wind, Canada geese flying over</li>
+      <li><span>0:14</span> Riverwood: footsteps on dry November leaves</li>
+      <li><span>0:28</span> Mississauga Road: cars, a bus stops, air brakes, door chime</li>
+      <li><span>0:46</span> The Crosswalk: locator ticks, then the walk signal</li>
+      <li><span>0:58</span> Erindale GO: crossing bell, train horn, the train going by</li>
+    </ol>
+  </section>
+
+  <!-- PART B: VISUALSCAPE -->
+  <section id="partB">
+    <h2>Part B: Visualscape</h2>
+    <p>The scene follows the soundscape as it plays. Move your mouse over it, and click the geese, the bus, the train or the walk signal.</p>
+
+    <div id="scene">
+      <div id="sky"></div>
+      <img id="stars" src="images/stars.svg" alt="">
+      <img id="moon" src="images/moon.svg" alt="The moon">
+      <img id="skyline" src="images/skyline.svg" alt="Mississauga City Centre skyline">
+      <img id="geese" src="images/geese.svg" alt="Canada geese flying in a V">
+      <img id="trees" src="images/trees.svg" alt="Trees">
+      <div id="track"></div>
+      <img id="train" src="images/train.svg" alt="A commuter train">
+      <div id="crossing">
+        <div id="lightLeft" class="light"></div>
+        <div id="lightRight" class="light"></div>
+        <div id="crossingPole"></div>
+      </div>
+      <img id="road" src="images/road.svg" alt="Mississauga Road">
+      <img id="river" src="images/river.svg" alt="The Credit River">
+      <img id="carRight" src="images/car-right.svg" alt="A car driving right">
+      <img id="carLeft" src="images/car-left.svg" alt="A car driving left">
+      <img id="bus" src="images/bus.svg" alt="A city bus">
+      <div id="signalPole"></div>
+      <img id="signal" src="images/signal-hand.svg" alt="Pedestrian signal">
+
+      <div id="leaves">
+        <img id="leaf1" class="leaf" src="images/leaf.svg" alt="">
+        <img id="leaf2" class="leaf" src="images/leaf.svg" alt="">
+        <img id="leaf3" class="leaf" src="images/leaf.svg" alt="">
+        <img id="leaf4" class="leaf" src="images/leaf.svg" alt="">
+        <img id="leaf5" class="leaf" src="images/leaf.svg" alt="">
+      </div>
+
+      <div id="caption">
+        <p id="partNumber">Press play</p>
+        <h3 id="partName">Erindale After Dark</h3>
+        <p id="partText">The scene is asleep until the sound starts.</p>
+      </div>
+
+      <div id="progressBar"><div id="progress"></div></div>
+    </div>
+
+    <div id="controls">
+      <button id="playBtn">Play</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="stopBtn">Stop</button>
+      <button id="volDownBtn">Volume -</button>
+      <button id="volUpBtn">Volume +</button>
+      <button id="slowBtn">0.5x</button>
+      <button id="normalBtn">1x</button>
+      <button id="fastBtn">1.5x</button>
+    </div>
+
+    <div id="chapters">
+      <p>Jump to:</p>
+      <button id="part1Btn">River</button>
+      <button id="part2Btn">Riverwood</button>
+      <button id="part3Btn">Mississauga Rd</button>
+      <button id="part4Btn">Crosswalk</button>
+      <button id="part5Btn">GO Train</button>
+    </div>
+
+    <p id="message">time: 0:00 | volume: 100% | speed: 1x</p>
+    <p id="fact">Click something in the scene.</p>
+  </section>
+
+  <!-- short sound effects for clicking things in the scene -->
+  <audio id="gooseSound" preload="auto">
+    <source src="audio/goose.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="chimeSound" preload="auto">
+    <source src="audio/chime.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="hornSound" preload="auto">
+    <source src="audio/horn.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="cuckooSound" preload="auto">
+    <source src="audio/cuckoo.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Part B: Visualscape -->
-  <div id="scene">
-    <div id="moon"></div>
-  </div>
-
-  <button id="playBtn">Play</button>
-  <button id="pauseBtn">Pause</button>
-  <button id="stopBtn">Stop</button>
-
-  <p id="message">Press play to start</p>
-
   <footer>
-    <p>CCT360 Lab 5 by Tony Ren.</p>
+    <p>CCT360 Lab 5 by Tony Ren. All sounds and illustrations were made from scratch for this lab (synthesized audio and hand-coded SVG images).</p>
   </footer>
 
   <script src="js/script.js"></script>
