@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 5 - Sound and Vision</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <h1>Mississauga at Night</h1>
+  <p>A soundscape of my neighbourhood in Erindale. Press play and watch the scene react.</p>
+
+  <!-- Part A: Soundscape -->
+  <audio id="player">
+    <source src="audio/soundscape.mp3" type="audio/mpeg">
+    Your browser does not support this audio element
+  </audio>
+
+  <!-- Part B: Visualscape -->
+  <div id="scene">
+    <div id="moon"></div>
+  </div>
+
+  <button id="playBtn">Play</button>
+  <button id="pauseBtn">Pause</button>
+  <button id="stopBtn">Stop</button>
+
+  <p id="message">Press play to start</p>
+
+  <footer>
+    <p>CCT360 Lab 5 by Tony Ren.</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
